@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "outDir": "./built",
+      "allowJs": true,
+      "target": "ESNext",
+      "module": "CommonJS",
+      "baseUrl": "./",
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "paths": {
+        "@/*": ["./*"]
+      }
+    },
+    "include": ["./src/**/*", "config.ts"],
+    "exclude": ["node_modules", "package.json", "package-lock.json", "yarn.lock", "config.example.ts"]
+  }
