@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.firecrawl = firecrawl;
 const zod_1 = require("zod");
 const client_1 = require("./client");
-async function firecrawl(searchConfig) {
-    const { url, searchQuery, company, customQuery } = searchConfig;
-    console.log(`Starting FIRECRAWL search on ${company}`);
-    const prompt = customQuery ? customQuery :
-        `Extract all job positions related to ${searchQuery}. Include title and application link as required fields. Optionally include location, salary, visa, and description if available. Search across the first 3 pages of the site if possible.`;
+async function firecrawl(searchInput) {
+    const { searchConfig } = searchInput;
+    const { scrapeFrom, aiQuery, roleType } = searchConfig;
+    console.log(`Starting FIRECRAWL search on ${scrapeFrom.name}`);
+    // const prompt = customQuery ? customQuery :
+    //     `Extract all job positions related to ${searchQuery}. Include title and application link as required fields. Optionally include location, salary, visa, and description if available. Search across the first 3 pages of the site if possible.`
     const schema = zod_1.z.object({
         positions: zod_1.z.array(zod_1.z.object({
             title: zod_1.z.string(),
@@ -18,9 +19,9 @@ async function firecrawl(searchConfig) {
         }))
     });
     const response = await client_1.app.extract([
-        `${url}`
+        `${scrapeFrom.url}`
     ], {
-        prompt: prompt,
+        prompt: aiQuery,
         schema,
     });
     const jobs = 'data' in response ? response.data.positions : [];
@@ -28,7 +29,7 @@ async function firecrawl(searchConfig) {
         jobs,
         success: true,
         count: jobs.length,
-        source: "firecrawl"
+        tool: "firecrawl"
     };
     return data;
 }

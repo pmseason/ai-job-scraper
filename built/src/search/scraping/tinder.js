@@ -2,20 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser, keyword, roleType) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to url, no prefilling data
-        await page.goto(roleType == "apm" ?
-            `https://www.lifeattinder.com/?departments=product%7Cproductmanagement%7Cproductanalytics&search=${encodeURIComponent(keyword)}&job-type=fulltime#open-positions` : `https://www.lifeattinder.com/?departments=product%7Cproductmanagement%7Cproductanalytics&search=${encodeURIComponent(keyword)}&job-type=internship#open-positions`);
+        await page.goto(url);
         //not working rn
         const noJobsSelector = "div[class*=jetboost-list-wrapper-empty]";
         const noJobs = await page.$eval(noJobsSelector, (div) => {
-            // console.log(div.classList)
             return !div.classList.contains('jetboost-list-item-hide');
         });
         if (noJobs) {
-            return { jobs: [], success: true, count: 0, source: "scraping" };
+            return { jobs: [], success: true, count: 0, tool: "scraping" };
         }
         // Navigate through more positions (pagination)
         const morePositionsSelector = 'a[class*="jetboost-pagination-next-"]';
@@ -40,12 +41,12 @@ async function scrape(browser, keyword, roleType) {
             const link = await jobCard.$eval("a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Tider audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();

@@ -2,19 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to page, no search
-        //they have api also
-        await page.goto(`https://www.cloudflare.com/careers/jobs/?department=Product`);
+        await page.goto(url);
         // TODO: Check for existence of the no-results banner
         const jobListSelector = "div#jobs-list";
         const jobList = await page.$(jobListSelector);
         if (jobList) {
             const childCount = await page.evaluate((jobList) => jobList.childElementCount, jobList);
             if (childCount === 1) {
-                return { jobs: [], success: true, message: "No jobs found from this source", source: "scraping", count: 0 };
+                return { jobs: [], success: true, message: "No jobs found from this source", tool: "scraping", count: 0 };
             }
         }
         //scroll so we can see whats going on
@@ -34,12 +36,12 @@ async function scrape(browser) {
             const link = await jobCard.$eval("a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Cloudflare audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();

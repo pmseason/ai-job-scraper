@@ -5,12 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.main = main;
 const puppeteer_core_1 = __importDefault(require("puppeteer-core"));
-const client_1 = require("./lib/supabase/client");
-const audit_1 = __importDefault(require("./audit"));
 const axios_1 = __importDefault(require("axios"));
-const utils_1 = require("./lib/utils");
-async function setupBrowser() {
-    const response = await axios_1.default.get("http://localhost:9222/json/version");
+const search_1 = require("./search");
+const fs = require('fs');
+async function setupBrowser(chromeUrl) {
+    // const response = await axios.get("http://localhost:9222/json/version");
+    const response = await axios_1.default.get(`${chromeUrl}/json/version`);
     const { webSocketDebuggerUrl } = response.data;
     const browser = await puppeteer_core_1.default.connect({
         browserWSEndpoint: webSocketDebuggerUrl,
@@ -18,20 +18,51 @@ async function setupBrowser() {
     });
     return browser;
 }
-async function fetchPositions() {
-    const { data, error } = await client_1.supabase.from("positions").select("*");
-    if (error) {
-        console.error(error);
-        return [];
+async function runAudit(browser, searchConfigs) {
+    const results = [];
+    const jobQueue = createJobQueue(searchConfigs, 3);
+    const timestamp = new Date().toISOString();
+    for (const jobSet of jobQueue) {
+        await Promise.all(jobSet.map(async (searchConfig) => {
+            const searchResults = await (0, search_1.search)({ searchConfig, browser, timestamp });
+            results.push(...searchResults);
+        }));
     }
-    return data;
+    return results;
 }
-async function main() {
-    await (0, utils_1.delay)(5000);
-    const browser = await setupBrowser();
-    // const positions = await fetchPositions();
-    // const positions = [];
-    await (0, audit_1.default)(browser);
+/**
+ * @param [maxConcurrency=3] maximum number of concurrent jobs, defaults to 3
+ * @returns jobQueue - a 2D array, where each element is an array of concurrent jobs that will be run together
+ */
+function createJobQueue(searchList, maxConcurrency = 3) {
+    const jobQueue = [];
+    let tempQueue = [];
+    for (const searchConfig of searchList) {
+        tempQueue.push(searchConfig);
+        if (tempQueue.length === maxConcurrency) {
+            jobQueue.push(tempQueue);
+            tempQueue = [];
+        }
+    }
+    if (tempQueue.length > 0) {
+        jobQueue.push(tempQueue);
+    }
+    return jobQueue;
+}
+async function main(searchConfigs, chromeUrl) {
+    const browser = await setupBrowser(chromeUrl);
+    const results = await runAudit(browser, searchConfigs);
+    fs.writeFileSync('e.json', JSON.stringify(results, null, 2));
     browser.disconnect();
+    return results;
 }
-main();
+const c = [{
+        scrapeFrom: {
+            name: "cloudflare",
+            url: "https://www.cloudflare.com/careers/jobs/?department=Product"
+        },
+        roleType: "apm",
+        aiQuery: "Job must be for Product Manager roles",
+    }];
+const url = "http://localhost:9222";
+main(c, url).then(console.log).catch(console.error);

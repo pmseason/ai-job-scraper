@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
-async function scrape(browser) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to page, no in query params possible
-        await page.goto(`https://www.figma.com/careers/#job-openings`);
+        await page.goto(url);
         // they dont have no results, or search!!!
         // pagination - they dont have any!!!
         const jobSectionSelector = "section#job-openings";
@@ -21,12 +24,12 @@ async function scrape(browser) {
             const link = await jobCard.$eval("a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Figma audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();

@@ -2,11 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser, keyword) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to url, prefill data
-        await page.goto(`https://www.yahooinc.com/careers/search.html?searchText=${encodeURIComponent(keyword)}&location=%22United%20States%22`);
+        await page.goto(url);
         // Wait for the title to contain specific text
         const titleSelector = "h1.resultsTitle";
         const waitForKeyword = "jobs";
@@ -39,12 +42,12 @@ async function scrape(browser, keyword) {
             const link = await jobCard.$eval("a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Yahoo audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();

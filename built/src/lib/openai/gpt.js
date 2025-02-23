@@ -13,21 +13,21 @@ const JobSchema = zod_1.z.object({
         other: zod_1.z.string().optional(),
     }))
 });
-function buildConditions(roleType, aiQueries) {
-    const baseConditions = [
-        "Job CANNOT have 'senior' or any other word that implies more experience. We are looking for " +
-            (roleType === "apm"
-                ? "New Grad, Junior, Associate, and Entry Level roles."
-                : "Internship and Fellowship roles."),
-        "Job MUST be located Remote or in the United States of America.",
-    ];
-    const queryConditions = aiQueries.map((query) => `- ${query}`);
-    return [...queryConditions, ...baseConditions].join("\n");
-}
+// function buildConditions(roleType: RoleType, aiQueries: string[]) {
+//   const baseConditions = [
+//     "Job CANNOT have 'senior' or any other word that implies more experience. We are looking for " +
+//     (roleType === "apm"
+//       ? "New Grad, Junior, Associate, and Entry Level roles."
+//       : "Internship and Fellowship roles."),
+//     "Job MUST be located Remote or in the United States of America.",
+//   ];
+//   const queryConditions = aiQueries.map((query) => `- ${query}`);
+//   return [...queryConditions, ...baseConditions].join("\n");
+// }
 async function filterJobs(searchResult) {
     const { jobs, searchConfig } = searchResult;
-    console.log(`Starting AI FILTER for jobs from ${searchConfig.company} search`);
-    const { roleType, jobConditions } = searchConfig;
+    console.log(`Starting AI FILTER for jobs from ${searchConfig.scrapeFrom.name}`);
+    const { roleType, aiQuery } = searchConfig;
     const CHUNK_SIZE = 10; // Adjust based on expected token size per job
     const chunks = [];
     const validJobs = [];
@@ -44,7 +44,7 @@ async function filterJobs(searchResult) {
                     role: "system",
                     content: `You are an expert at structured data extraction. You will be given unstructured data from a job site \
                   audit and should filter it and convert it into the given structure. Here is the criteria for a valid job: \
-                    ${buildConditions(roleType, jobConditions)}`,
+                    ${aiQuery}`,
                 },
                 { role: "user", content: JSON.stringify(userInput) },
             ],
@@ -60,6 +60,6 @@ async function filterJobs(searchResult) {
         success: true,
         searchConfig,
         count: validJobs.length,
-        source: "scraping+ai"
+        tool: "scraping+ai"
     };
 }

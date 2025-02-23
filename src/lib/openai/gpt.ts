@@ -50,10 +50,9 @@ export async function filterJobs(searchResult: SearchResult): Promise<SearchResu
       messages: [
         {
           role: "system",
-          // content: `You are an expert at structured data extraction. You will be given unstructured data from a job site \
-          //         audit and should filter it and convert it into the given structure. Here is the criteria for a valid job: \
-          //           ${buildConditions(roleType, jobConditions)}`,
-          content: aiQuery,
+          content: `You are an expert at structured data extraction. You will be given unstructured data from a job site \
+                  audit and should filter it and convert it into the given structure. Here is the criteria for a valid job: \
+                    ${aiQuery}`,
         },
         { role: "user", content: JSON.stringify(userInput) },
       ],

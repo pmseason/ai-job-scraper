@@ -9,7 +9,7 @@ const supportedSources = getSupportedSources();
 export async function search(input: SearchInput): Promise<SearchResult[]> {
     const { searchConfig, timestamp } = input;
     const { scrapeFrom } = searchConfig;
-    const isSupported = supportedSources.find(source => source.name === scrapeFrom.name && source.url === scrapeFrom.url);
+    const isSupported = supportedSources.find(source => source.name === scrapeFrom.name && scrapeFrom.url.startsWith(source.url));
     if (!isSupported) {
         const firecrawlResult = await firecrawl(input);
         return [{...firecrawlResult, timestamp, searchConfig}];

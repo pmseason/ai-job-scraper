@@ -2,15 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser, roleType) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to page, no keywords or search!!
-        await page.goto(roleType == "apm" ? `https://www.lifeatspotify.com/jobs?c=product&l=new-york&l=los-angeles&l=boston&l=detroit` : `https://www.lifeatspotify.com/jobs?c=product&c=students&l=boston&l=los-angeles&l=new-york`);
+        await page.goto(url);
         // Check for existence of the no-results banner
         const noResults = await page.$("div.container div.row div[class*='noresult']");
         if (noResults) {
-            return { jobs: [], success: true, message: "No jobs found from this source", source: "scraping" };
+            return { jobs: [], success: true, message: "No jobs found from this source", tool: "scraping" };
         }
         await (0, utils_1.delay)(1000);
         // handle pagination
@@ -36,12 +39,12 @@ async function scrape(browser, roleType) {
             const link = await jobCard.$eval("div[class*='entry_header'] a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Spotify audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();

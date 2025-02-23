@@ -2,16 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser, keyword) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to page
-        await page.goto(`https://www.linkedin.com/jobs/search/?f_C=1337%2C39939%2C2587638%2C9202023&geoId=103644278&keywords=${encodeURIComponent(keyword)}`);
+        await page.goto(url);
         // await this.fillForm({page, keyword});
         // Check for existence of the no-results banner
         const noResults = await page.$('div.jobs-search-no-results-banner');
         if (noResults) {
-            return { jobs: [], success: true, message: "No jobs found from this source", source: "scraping", count: 0 };
+            return { jobs: [], success: true, message: "No jobs found from this source", tool: "scraping", count: 0 };
         }
         //scroll pagination into view
         const paginationSelector = 'div.jobs-search-pagination';
@@ -43,12 +46,12 @@ async function scrape(browser, keyword) {
             const link = await jobCard.$eval('a.job-card-container__link', (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during LinkedIn audit:", error);
-        return { jobs: [], success: false, error: err.message, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, tool: "scraping" };
     }
     finally {
         await page.close();

@@ -46,13 +46,13 @@ export const auditConfig: SearchConfig[] = [
   //   roleType: "apm",
   //   keyword: "product"
   // },
-  {
-    company: "walmart",
-    source: "scraping+ai",
-    roleType: "apm",
-    keyword: "product",
-    jobConditions: ["Job must be product manager"]
-  },
+  // {
+  //   company: "walmart",
+  //   source: "scraping+ai",
+  //   roleType: "apm",
+  //   keyword: "product",
+  //   jobConditions: ["Job must be product manager"]
+  // },
   // {
   //   company: "kpcb",
   //   source: "scraping+ai",

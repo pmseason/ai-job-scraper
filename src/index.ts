@@ -4,6 +4,7 @@ import { Browser } from "puppeteer-core";
 import { SearchConfig } from './types/config.type';
 import { SearchResult } from './types/audit.type';
 import { search } from './search';
+const fs = require('fs');
 
 async function setupBrowser(chromeUrl: string): Promise<Browser> {
     // const response = await axios.get("http://localhost:9222/json/version");
@@ -62,8 +63,20 @@ export async function main(searchConfigs: SearchConfig[], chromeUrl: string): Pr
     const browser = await setupBrowser(chromeUrl);
 
     const results = await runAudit(browser, searchConfigs);
+    fs.writeFileSync('e.json', JSON.stringify(results, null, 2));
 
     browser.disconnect()
 
     return results;
 }
+
+const c: SearchConfig[] = [{
+    scrapeFrom: {
+        name: "cloudflare",
+        url: "https://www.cloudflare.com/careers/jobs/?department=Product"
+    },
+    roleType: "apm",
+    aiQuery: "Job must be for Product Manager roles",
+}]
+const url = "http://localhost:9222";
+main(c, url).then(console.log).catch(console.error);

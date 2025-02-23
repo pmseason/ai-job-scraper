@@ -2,16 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrape = scrape;
 const utils_1 = require("../../lib/utils");
-async function scrape(browser, keyword) {
+async function scrape(input) {
+    const { browser, searchConfig } = input;
+    const { scrapeFrom } = searchConfig;
+    const { url } = scrapeFrom;
     const page = await browser.newPage();
     try {
         //go to page, no in query params possible
-        await page.goto(`https://instacart.careers/current-openings/`);
-        await fillForm({ page, keyword });
+        await page.goto(url);
+        // await fillForm({ page, keyword });
         // TODO: Check for existence of the no-results banner
         const noResults = await page.$('div.no-result-found');
         if (noResults) {
-            return { jobs: [], success: true, message: "No jobs found from this source", source: "scraping", count: 0 };
+            return { jobs: [], success: true, message: "No jobs found from this source", tool: "scraping", count: 0 };
         }
         await (0, utils_1.delay)(1000);
         // pagination - they dont have any!!!
@@ -26,12 +29,12 @@ async function scrape(browser, keyword) {
             const link = await jobCard.$eval("a", (element) => element.href);
             return { textContent, link };
         }));
-        return { jobs, success: true, count: jobs.length, source: "scraping" };
+        return { jobs, success: true, count: jobs.length, tool: "scraping" };
     }
     catch (error) {
         const err = error;
         console.error("Error during Instacart audit:", error);
-        return { jobs: [], success: false, error: err.message, count: 0, source: "scraping" };
+        return { jobs: [], success: false, error: err.message, count: 0, tool: "scraping" };
     }
     finally {
         await page.close();
