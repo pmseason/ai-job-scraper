@@ -3,13 +3,6 @@
   "version": "1.0.0",
   "main": "built/src/index.js",
   "bin": "built/src/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mrinal-c/ai-job-scraper.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@mrinal-c"
-  },
   "author": "Mrinal Chanshetty",
   "license": "MIT",
   "scripts": {
