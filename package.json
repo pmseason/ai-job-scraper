@@ -1,8 +1,11 @@
 {
-  "name": "@mrinal-c/ai-job-scraper",
+  "name": "ai-job-scraper",
   "version": "1.0.0",
   "main": "built/src/index.js",
   "bin": "built/src/index.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@mrinal-c"
+  },
   "author": "Mrinal Chanshetty",
   "license": "MIT",
   "scripts": {
