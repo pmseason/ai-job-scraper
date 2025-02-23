@@ -56,13 +56,13 @@ async function main(searchConfigs, chromeUrl) {
     browser.disconnect();
     return results;
 }
-const c = [{
-        scrapeFrom: {
-            name: "cloudflare",
-            url: "https://www.cloudflare.com/careers/jobs/?department=Product"
-        },
-        roleType: "apm",
-        aiQuery: "Job must be for Product Manager roles",
-    }];
-const url = "http://localhost:9222";
-main(c, url).then(console.log).catch(console.error);
+// const c: SearchConfig[] = [{
+//     scrapeFrom: {
+//         name: "cloudflare",
+//         url: "https://www.cloudflare.com/careers/jobs/?department=Product"
+//     },
+//     roleType: "apm",
+//     aiQuery: "Job must be for Product Manager roles",
+// }]
+// const url = "http://localhost:9222";
+// main(c, url).then(console.log).catch(console.error);
