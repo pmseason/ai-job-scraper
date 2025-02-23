@@ -1,5 +1,5 @@
 {
-  "name": "ai-job-scraper",
+  "name": "@mrinal-c/ai-job-scraper",
   "version": "1.0.0",
   "main": "built/src/index.js",
   "bin": "built/src/index.js",
