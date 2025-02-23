@@ -4,7 +4,7 @@
   "main": "built/src/index.js",
   "bin": "built/src/index.js",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@mrinal-c"
+    "registry": "https://npm.pkg.github.com/"
   },
   "author": "Mrinal Chanshetty",
   "license": "MIT",
