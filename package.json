@@ -1,10 +1,8 @@
 {
   "name": "@mrinal-c/ai-job-scraper",
   "version": "1.0.0",
-  "main": "built/src/index.js",
-  "bin": {
-    "ai-job-scraper": "built/src/index.js"
-  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrinal-c/ai-job-scraper.git"
@@ -13,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "prestart": "tsc",
-    "start": "node --env-file=.env built/src/index.js",
+    "start": "node --env-file=.env dist/src/index.js",
     "build": "tsc"
   },
   "dependencies": {

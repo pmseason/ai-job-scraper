@@ -1,42 +1,48 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = main;
-const puppeteer_core_1 = __importDefault(require("puppeteer-core"));
-const axios_1 = __importDefault(require("axios"));
-const search_1 = require("./search");
-const fs = require('fs');
-async function setupBrowser(chromeUrl) {
+import puppeteer from "puppeteer-core";
+import axios from "axios";
+import { Browser } from "puppeteer-core";
+import { SearchConfig } from '../types/config.type';
+import { SearchResult } from '../types/audit.type';
+import { search } from '../search';
+
+async function setupBrowser(chromeUrl: string): Promise<Browser> {
     // const response = await axios.get("http://localhost:9222/json/version");
-    const response = await axios_1.default.get(`${chromeUrl}/json/version`);
+    const response = await axios.get(`${chromeUrl}/json/version`);
     const { webSocketDebuggerUrl } = response.data;
-    const browser = await puppeteer_core_1.default.connect({
+    const browser = await puppeteer.connect({
         browserWSEndpoint: webSocketDebuggerUrl,
-        defaultViewport: { width: 1440, height: 900 },
+        defaultViewport: {width: 1440, height: 900},
     });
+
     return browser;
 }
-async function runAudit(browser, searchConfigs) {
-    const results = [];
+
+
+async function runAudit(browser: Browser, searchConfigs: SearchConfig[]): Promise<SearchResult[]> {
+    const results: SearchResult[] = []
     const jobQueue = createJobQueue(searchConfigs, 3);
     const timestamp = new Date().toISOString();
+
     for (const jobSet of jobQueue) {
-        await Promise.all(jobSet.map(async (searchConfig) => {
-            const searchResults = await (0, search_1.search)({ searchConfig, browser, timestamp });
-            results.push(...searchResults);
-        }));
+        await Promise.all(
+            jobSet.map(async (searchConfig: SearchConfig) => {
+                const searchResults = await search({ searchConfig, browser, timestamp })
+                results.push(...searchResults);
+            })
+        )
     }
+
     return results;
+
 }
+
 /**
  * @param [maxConcurrency=3] maximum number of concurrent jobs, defaults to 3
  * @returns jobQueue - a 2D array, where each element is an array of concurrent jobs that will be run together
  */
-function createJobQueue(searchList, maxConcurrency = 3) {
-    const jobQueue = [];
-    let tempQueue = [];
+function createJobQueue(searchList: SearchConfig[], maxConcurrency: number = 3): SearchConfig[][] {
+    const jobQueue: SearchConfig[][] = [];
+    let tempQueue: SearchConfig[] = [];
     for (const searchConfig of searchList) {
         tempQueue.push(searchConfig);
         if (tempQueue.length === maxConcurrency) {
@@ -49,13 +55,19 @@ function createJobQueue(searchList, maxConcurrency = 3) {
     }
     return jobQueue;
 }
-async function main(searchConfigs, chromeUrl) {
+
+
+
+export async function startAudit(searchConfigs: SearchConfig[], chromeUrl: string): Promise<SearchResult[]> {
     const browser = await setupBrowser(chromeUrl);
+
     const results = await runAudit(browser, searchConfigs);
-    fs.writeFileSync('e.json', JSON.stringify(results, null, 2));
-    browser.disconnect();
+
+    browser.disconnect()
+
     return results;
 }
+
 // const c: SearchConfig[] = [{
 //     scrapeFrom: {
 //         name: "cloudflare",
