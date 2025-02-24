@@ -4,3 +4,4 @@ dist/
 pkg.sh
 run.sh
 built/**
+src/lib/.DS_Store
