@@ -4,10 +4,12 @@ import { Browser } from "puppeteer-core";
 import { SearchConfig } from '../types/config.type';
 import { SearchResult } from '../types/audit.type';
 import { search } from '../search';
+import { changeUrlHostToUseIp } from "../lib/utils";
 
 async function setupBrowser(chromeUrl: string): Promise<Browser> {
     // const response = await axios.get("http://localhost:9222/json/version");
-    const response = await axios.get(`${chromeUrl}/json/version`);
+    const url = await changeUrlHostToUseIp(chromeUrl);
+    const response = await axios.get(`${url}json/version`);
     const { webSocketDebuggerUrl } = response.data;
     const browser = await puppeteer.connect({
         browserWSEndpoint: webSocketDebuggerUrl,
