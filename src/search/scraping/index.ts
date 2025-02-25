@@ -50,9 +50,9 @@ export function getSupportedSources(): SearchSource[] {
         { name: "instacart", url: "https://instacart.careers/current-openings/" },
         { name: "kpcb", url: "https://jobs.ashbyhq.com/kleinerperkinsfellows" },
         { name: "linkedin", url: "https://www.linkedin.com/jobs/search/" },
-        { name: "spotify", url: "hhttps://www.lifeatspotify.com/jobs" },
+        { name: "spotify", url: "https://www.lifeatspotify.com/jobs" },
         { name: "tinder", url: "https://www.lifeattinder.com/" },
         { name: "walmart", url: "https://careers.walmart.com/results" },
-        { name: "yahoo", url: "ttps://www.yahooinc.com/careers/search.html" }
+        { name: "yahoo", url: "https://www.yahooinc.com/careers/search.html" }
     ];
 }
