@@ -1,11 +1,11 @@
 {
-  "name": "@mrinal-c/ai-job-scraper",
+  "name": "@pmseason/ai-job-scraper",
   "version": "1.0.8",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrinal-c/ai-job-scraper.git"
+    "url": "git+https://github.com/pmseason/ai-job-scraper.git"
   },
   "author": "Mrinal Chanshetty",
   "license": "MIT",
