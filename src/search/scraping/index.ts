@@ -45,13 +45,13 @@ export async function scrape(input: SearchInput): Promise<SearchResult> {
 export function getSupportedSources(): SearchSource[] {
     return [
         { name: "atlassian", url: "https://www.atlassian.com/company/careers/all-jobs" },
-        { name: "cloudflare", url: "https://www.cloudflare.com/careers/jobs/" },
+        { name: "cloudflare", url: "https://www.cloudflare.com/careers/jobs" },
         { name: "figma", url: "https://www.figma.com/careers/#job-openings" },
-        { name: "instacart", url: "https://instacart.careers/current-openings/" },
+        { name: "instacart", url: "https://instacart.careers/current-openings" },
         { name: "kpcb", url: "https://jobs.ashbyhq.com/kleinerperkinsfellows" },
-        { name: "linkedin", url: "https://www.linkedin.com/jobs/search/" },
+        { name: "linkedin", url: "https://www.linkedin.com/jobs/search" },
         { name: "spotify", url: "https://www.lifeatspotify.com/jobs" },
-        { name: "tinder", url: "https://www.lifeattinder.com/" },
+        { name: "tinder", url: "https://www.lifeattinder.com" },
         { name: "walmart", url: "https://careers.walmart.com/results" },
         { name: "yahoo", url: "https://www.yahooinc.com/careers/search.html" }
     ];
