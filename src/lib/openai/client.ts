@@ -2,9 +2,9 @@ import OpenAI from 'openai';
 
 let client: OpenAI;
 
-export function configGpt(apiKey: string) {
+export function configGpt() {
     client = new OpenAI({
-        apiKey: apiKey,
+        apiKey: process.env.OPENAI_API_KEY
     });
 }
 

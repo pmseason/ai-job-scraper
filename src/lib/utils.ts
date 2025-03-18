@@ -12,8 +12,10 @@ export function delay(milliseconds: number) {
 }
 
 export function configure(firecrawlApiKey: string, openaiApiKey: string) {
-    configFirecrawl(firecrawlApiKey);
-    configGpt(openaiApiKey);
+    process.env.FIRECRAWL_API_KEY = firecrawlApiKey;
+    process.env.OPENAI_API_KEY = openaiApiKey;
+    configFirecrawl();
+    configGpt();
 }
 
 export async function testConnection(chromeUrl?: string): Promise<boolean> {

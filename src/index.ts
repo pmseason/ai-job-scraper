@@ -1,3 +1,4 @@
+export { checkRoleOpen } from './agent/agent';
 export { getSupportedSources } from './search/scraping';
 export { startAudit } from './main/index';
 export type { SearchResult, Job, RawJob, ProcessedJob, ScrapedJob, SearchTool } from './types/audit.type';

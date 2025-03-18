@@ -5,7 +5,7 @@ import { SearchConfig } from '../types/config.type';
 import { SearchResult } from '../types/audit.type';
 import { search } from '../search';
 
-async function setupBrowser(chromeUrl?: string): Promise<Browser> {
+export async function setupBrowser(chromeUrl?: string): Promise<Browser> {
     //accept remote url, otherwise assume chrome is running locally on port 9222
     const response = await axios.get(`${chromeUrl ?? "http://localhost:9222"}/json/version`);
     const { webSocketDebuggerUrl } = response.data;
