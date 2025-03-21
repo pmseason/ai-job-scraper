@@ -5,30 +5,29 @@ import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
 import { z } from "zod";
 import { setupBrowser } from "../main";
 import { delay } from "../lib/utils";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 
-// Define the tools for the agent to use
-// const tools = [];
-// const toolNode = new ToolNode(tools);
 
-// Create a model and give it access to the tools
-// const model = new ChatOpenAI({
-//   model: "gpt-4o-mini",
-//   temperature: 0,
-// }).bindTools(tools);
 const llm = new ChatOpenAI({
     model: "gpt-4o-mini",
     temperature: 0
 });
 
+// Define structured response schema (boolean)
+const OpenRoleSchema = z.object({
+    status: z.enum(["open", "closed", "unsure"]),
+    justification: z.string()
+});
 
 
-export async function checkRoleOpen(url: string): Promise<boolean | undefined> {
+export async function checkRoleOpen(url: string): Promise<{ status: "open" | "closed" | "unsure", justification: string }> {
     try {
         const browser = await setupBrowser();
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle0' });
-        await delay(5000)
+        await page.goto(url);
+        await delay(3000)
 
         // Take a screenshot and convert to base64
         const base64Image = await page.screenshot({ encoding: "base64" });
@@ -36,14 +35,12 @@ export async function checkRoleOpen(url: string): Promise<boolean | undefined> {
         // Define the system instruction
         const system_prompt = `
         You are an expert working at a job posting website. Given the screenshot of a webpage for an application link, 
-        determine if this role is open or closed. Use the context clues on the screen to evaluate whether applicants can still apply. 
-        Respond with either True (if open) or False (if closed).
+        determine if this role is open or closed. Use the context clues on the screen to evaluate whether applicants can still apply. If you cannot 
+        decide, respond with unsure. You must give a short reasoning/justification for why you made a decision.
+        Respond with either **open**, **closed**, or **unsure**.
         `;
 
-        // Define structured response schema (boolean)
-        const OpenRoleSchema = z.object({
-            isOpen: z.boolean()
-        })
+
 
         // Construct messages for the LLM
         const messages = [
@@ -64,7 +61,11 @@ export async function checkRoleOpen(url: string): Promise<boolean | undefined> {
         await page.close()
         await browser.disconnect()
 
-        return response.isOpen ?? false;
+        const { status, justification } = response;
+
+        if (!status || !justification) return { status: "unsure", justification: "AI had an error while extracting data" }
+
+        return { status, justification }
     } catch (error) {
         console.error("Error in parseTransaction:", error);
         return undefined; // Return undefined on failure
