@@ -68,6 +68,6 @@ export async function checkRoleOpen(url: string): Promise<{ status: "open" | "cl
         return { status, justification }
     } catch (error) {
         console.error("Error in parseTransaction:", error);
-        return undefined; // Return undefined on failure
+        return { status: "closed", justification: "An error occurred while fetching page data, meaning this URL may be invalid" }; // Return undefined on failure
     }
 }
